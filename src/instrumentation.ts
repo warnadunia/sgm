@@ -24,6 +24,8 @@ export async function register() {
       if (await ensureAdminUser()) {
         console.log("[sgm] Akun admin awal dibuat:", process.env.ADMIN_EMAIL);
       }
+      const { ensureInitialContent } = await import("@/db/ensure-seed");
+      await ensureInitialContent();
     } catch (err) {
       console.error("[sgm] Migrasi/inisialisasi DB gagal:", err);
     }

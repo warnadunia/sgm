@@ -8,7 +8,8 @@ import path from "node:path";
 
 loadEnvFile();
 
-const url = process.env.DATABASE_URL || "file:./data/dev.db";
+const defaultUrl = process.env.VERCEL ? "file:/tmp/dev.db" : "file:./data/dev.db";
+const url = process.env.DATABASE_URL || defaultUrl;
 const authToken = process.env.DATABASE_AUTH_TOKEN;
 
 if (url.startsWith("file:")) {

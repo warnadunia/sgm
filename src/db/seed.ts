@@ -11,12 +11,14 @@ import { createId } from "../lib/id";
 const blocks = (b: unknown) => JSON.stringify(b);
 const imgs = (a: string[]) => JSON.stringify(a);
 
-async function main() {
-  console.log("Membersihkan data lama…");
-  await db.delete(posts);
-  await db.delete(artworks);
-  await db.delete(products);
-  await db.delete(microsites);
+export async function seedDatabase(opts?: { clean?: boolean }) {
+  if (opts?.clean) {
+    console.log("Membersihkan data lama…");
+    await db.delete(posts);
+    await db.delete(artworks);
+    await db.delete(products);
+    await db.delete(microsites);
+  }
 
   // ------------------------------------------------------------------ IDS
   const idResidensi = createId();
@@ -522,10 +524,16 @@ async function main() {
   await ensureAdminUser();
 
   console.log("✓ Seed selesai!");
+}
+
+async function main() {
+  await seedDatabase({ clean: true });
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error("Seed gagal:", err);
-  process.exit(1);
-});
+if (process.argv[1]?.replace(/\\/g, "/").includes("seed")) {
+  main().catch((err) => {
+    console.error("Seed gagal:", err);
+    process.exit(1);
+  });
+}

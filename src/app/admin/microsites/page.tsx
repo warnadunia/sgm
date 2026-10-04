@@ -3,7 +3,6 @@ import { assertAdminPage } from "@/lib/admin-guard";
 import { adminListMicrosites } from "@/lib/data";
 import { formatDateRange, micrositeUrl } from "@/lib/utils";
 import { DeleteButton } from "@/components/admin/DeleteButton";
-import { deleteMicrositeAction } from "@/lib/actions/microsite";
 import { ExternalLink, Pencil, Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -48,7 +47,7 @@ export default async function AdminMicrositesPage() {
             <Link href={`/admin/microsites/${m.id}`} className="inline-flex items-center gap-1 border-2 border-ink px-3 py-1.5 font-mono text-[10px] tracking-wider hover:bg-riso-yellow">
               <Pencil className="h-3 w-3" /> SUNTING
             </Link>
-            <DeleteButton onDelete={async () => deleteMicrositeAction(m.id)} />
+            <DeleteButton entity="microsite" id={m.id} />
           </div>
         ))}
         {list.length === 0 && <p className="px-4 py-8 text-center font-mono text-xs text-ink-soft">Belum ada microsite.</p>}

@@ -3,7 +3,6 @@ import { assertAdminPage } from "@/lib/admin-guard";
 import { adminListArtworks } from "@/lib/data";
 import { firstImage } from "@/lib/utils";
 import { DeleteButton } from "@/components/admin/DeleteButton";
-import { deleteArtworkAction } from "@/lib/actions/content";
 import { Pencil, Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +40,7 @@ export default async function AdminArtworksPage() {
                 <Link href={`/admin/artworks/${a.id}`} className="inline-flex flex-1 items-center justify-center gap-1 border-2 border-ink px-2 py-1.5 font-mono text-[10px] tracking-wider hover:bg-riso-yellow">
                   <Pencil className="h-3 w-3" /> SUNTING
                 </Link>
-                <DeleteButton onDelete={async () => deleteArtworkAction(a.id)} label="HAPUS" />
+                <DeleteButton entity="artwork" id={a.id} label="HAPUS" />
               </div>
             </div>
           </div>

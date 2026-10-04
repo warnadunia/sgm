@@ -2,15 +2,26 @@
 
 import { useState, useTransition } from "react";
 import { Trash2, Loader2 } from "lucide-react";
+import { deleteMicrositeAction } from "@/lib/actions/microsite";
+import { deleteArtworkAction, deletePostAction, deleteProductAction } from "@/lib/actions/content";
+
+const ACTIONS = {
+  microsite: deleteMicrositeAction,
+  artwork: deleteArtworkAction,
+  product: deleteProductAction,
+  post: deletePostAction,
+} as const;
 
 export function DeleteButton({
+  entity,
+  id,
   label = "Hapus",
   confirmText = "Yakin hapus? Tindakan ini tidak bisa dibatalkan.",
-  onDelete,
 }: {
+  entity: keyof typeof ACTIONS;
+  id: string;
   label?: string;
   confirmText?: string;
-  onDelete: () => Promise<void>;
 }) {
   const [pending, start] = useTransition();
   const [armed, setArmed] = useState(false);
@@ -25,7 +36,7 @@ export function DeleteButton({
           setTimeout(() => setArmed(false), 3500);
           return;
         }
-        if (window.confirm(confirmText)) start(async () => onDelete());
+        if (window.confirm(confirmText)) start(async () => ACTIONS[entity](id));
         setArmed(false);
       }}
       className={`inline-flex items-center gap-1.5 border-2 px-3 py-1.5 font-mono text-[11px] tracking-wider transition-colors ${

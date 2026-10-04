@@ -3,7 +3,6 @@ import { assertAdminPage } from "@/lib/admin-guard";
 import { adminListProducts } from "@/lib/data";
 import { formatIDR, parseJsonArray } from "@/lib/utils";
 import { DeleteButton } from "@/components/admin/DeleteButton";
-import { deleteProductAction } from "@/lib/actions/content";
 import { Pencil, Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -47,7 +46,7 @@ export default async function AdminProductsPage() {
               <Link href={`/admin/products/${p.id}`} className="inline-flex items-center gap-1 border-2 border-ink px-3 py-1.5 font-mono text-[10px] tracking-wider hover:bg-riso-yellow">
                 <Pencil className="h-3 w-3" /> SUNTING
               </Link>
-              <DeleteButton onDelete={async () => deleteProductAction(p.id)} label="HAPUS" />
+              <DeleteButton entity="product" id={p.id} label="HAPUS" />
             </div>
           );
         })}

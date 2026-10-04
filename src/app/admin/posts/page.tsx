@@ -3,7 +3,6 @@ import { assertAdminPage } from "@/lib/admin-guard";
 import { adminListPosts } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import { DeleteButton } from "@/components/admin/DeleteButton";
-import { deletePostAction } from "@/lib/actions/content";
 import { Pencil, Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +42,7 @@ export default async function AdminPostsPage() {
             <Link href={`/admin/posts/${p.id}`} className="inline-flex items-center gap-1 border-2 border-ink px-3 py-1.5 font-mono text-[10px] tracking-wider hover:bg-riso-yellow">
               <Pencil className="h-3 w-3" /> SUNTING
             </Link>
-            <DeleteButton onDelete={async () => deletePostAction(p.id)} label="HAPUS" />
+            <DeleteButton entity="post" id={p.id} label="HAPUS" />
           </div>
         ))}
         {list.length === 0 && <p className="px-4 py-8 text-center font-mono text-xs text-ink-soft">Belum ada tulisan.</p>}

@@ -16,7 +16,7 @@ export async function register() {
 
   if (fs.existsSync(migrationsFolder)) {
     try {
-      const { migrate } = await import("drizzle-orm/libsql/migrator");
+      const { migrate } = await import("drizzle-orm/neon-http/migrator");
       const { db } = await import("@/db/client");
       await migrate(db, { migrationsFolder });
       console.log("[sgm] Migrasi database OK");

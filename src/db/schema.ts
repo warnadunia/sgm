@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createId } from "../lib/id";
 
 // ---------------------------------------------------------------------------
@@ -7,7 +7,7 @@ import { createId } from "../lib/id";
 // microsite sendiri, bisa dijadikan "headline" di landing page, dan untuk
 // event yang sedang berlangsung info lengkap HANYA tampil di microsite.
 // ---------------------------------------------------------------------------
-export const microsites = sqliteTable("microsites", {
+export const microsites = pgTable("microsites", {
   id: text("id").primaryKey().$defaultFn(createId),
   slug: text("slug").notNull().unique(),
   kind: text("kind").notNull(), // "PROGRAM" | "EVENT"
@@ -20,23 +20,23 @@ export const microsites = sqliteTable("microsites", {
   status: text("status").notNull().default("PUBLISHED"), // DRAFT | PUBLISHED | ARCHIVED
   edition: text("edition"),
   location: text("location"),
-  startDate: integer("start_date", { mode: "timestamp_ms" }),
-  endDate: integer("end_date", { mode: "timestamp_ms" }),
-  isLiveNow: integer("is_live_now", { mode: "boolean" }).notNull().default(false),
-  isHeadline: integer("is_headline", { mode: "boolean" }).notNull().default(false),
+  startDate: timestamp("start_date", { mode: "date" }),
+  endDate: timestamp("end_date", { mode: "date" }),
+  isLiveNow: boolean("is_live_now").notNull().default(false),
+  isHeadline: boolean("is_headline").notNull().default(false),
   headlineOrder: integer("headline_order").notNull().default(0),
   ctaLabel: text("cta_label"),
   ctaUrl: text("cta_url"),
   blocks: text("blocks"), // JSON ContentBlock[]
   images: text("images"), // JSON string[]
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
 // ---------------------------------------------------------------------------
 // ARTWORK — galeri & katalog karya (arsip)
 // ---------------------------------------------------------------------------
-export const artworks = sqliteTable("artworks", {
+export const artworks = pgTable("artworks", {
   id: text("id").primaryKey().$defaultFn(createId),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
@@ -49,15 +49,15 @@ export const artworks = sqliteTable("artworks", {
   category: text("category").notNull().default("Karya"),
   description: text("description"),
   images: text("images"), // JSON string[]
-  featured: integer("featured", { mode: "boolean" }).notNull().default(false),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
+  featured: boolean("featured").notNull().default(false),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
 // ---------------------------------------------------------------------------
 // PRODUCT — artshop & merchandise (multi-image)
 // ---------------------------------------------------------------------------
-export const products = sqliteTable("products", {
+export const products = pgTable("products", {
   id: text("id").primaryKey().$defaultFn(createId),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
@@ -67,16 +67,16 @@ export const products = sqliteTable("products", {
   stock: integer("stock").notNull().default(0),
   category: text("category").notNull().default("Merchandise"),
   images: text("images"), // JSON string[] — bisa lebih dari satu gambar
-  isFeatured: integer("is_featured", { mode: "boolean" }).notNull().default(false),
-  isAvailable: integer("is_available", { mode: "boolean" }).notNull().default(true),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
+  isFeatured: boolean("is_featured").notNull().default(false),
+  isAvailable: boolean("is_available").notNull().default(true),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
 // ---------------------------------------------------------------------------
 // POST — blog / news & update. Opsional terhubung ke microsite.
 // ---------------------------------------------------------------------------
-export const posts = sqliteTable("posts", {
+export const posts = pgTable("posts", {
   id: text("id").primaryKey().$defaultFn(createId),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
@@ -85,18 +85,18 @@ export const posts = sqliteTable("posts", {
   coverImage: text("cover_image"),
   category: text("category").notNull().default("Umum"),
   micrositeId: text("microsite_id").references(() => microsites.id, { onDelete: "set null" }),
-  published: integer("published", { mode: "boolean" }).notNull().default(true),
-  publishedAt: integer("published_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
+  published: boolean("published").notNull().default(true),
+  publishedAt: timestamp("published_at", { mode: "date" }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
-export const adminUsers = sqliteTable("admin_users", {
+export const adminUsers = pgTable("admin_users", {
   id: text("id").primaryKey().$defaultFn(createId),
   email: text("email").notNull().unique(),
   name: text("name"),
   passwordHash: text("password_hash").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
 export type Microsite = typeof microsites.$inferSelect;
@@ -107,3 +107,5 @@ export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type NewAdminUser = typeof adminUsers.$inferInsert;

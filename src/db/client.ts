@@ -1,42 +1,24 @@
-import { createClient, type Client } from "@libsql/client";
-import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
+import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { loadEnvFile } from "./env";
 import * as schema from "./schema";
 
-import fs from "node:fs";
-import path from "node:path";
-
 loadEnvFile();
 
-const defaultUrl = process.env.VERCEL ? "file:/tmp/dev.db" : "file:./data/dev.db";
-const url = process.env.DATABASE_URL || defaultUrl;
-const authToken = process.env.DATABASE_AUTH_TOKEN;
-
-if (url.startsWith("file:")) {
-  const filePath = url.replace(/^file:/, "");
-  const dir = path.dirname(path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath));
-  if (!fs.existsSync(dir)) {
-    try {
-      fs.mkdirSync(dir, { recursive: true });
-    } catch {
-      // Ignore if cannot create directory (e.g. read-only environment)
-    }
-  }
-}
+const defaultUrl =
+  "postgresql://neondb_owner:npg_YzcGMTdeq3A6@ep-calm-shadow-azo3mput-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+const connectionString = process.env.DATABASE_URL || defaultUrl;
 
 const globalForDb = globalThis as unknown as {
-  libsql?: Client;
-  drizzle?: LibSQLDatabase<typeof schema>;
+  sql?: NeonQueryFunction<false, false>;
+  drizzle?: NeonHttpDatabase<typeof schema>;
 };
 
-export const libsql =
-  globalForDb.libsql ?? createClient({ url, authToken: authToken || undefined });
-
-export const db =
-  globalForDb.drizzle ?? drizzle(libsql, { schema });
+export const sql = globalForDb.sql ?? neon(connectionString);
+export const db = globalForDb.drizzle ?? drizzle(sql, { schema });
 
 if (process.env.NODE_ENV !== "production") {
-  globalForDb.libsql = libsql;
+  globalForDb.sql = sql;
   globalForDb.drizzle = db;
 }
 

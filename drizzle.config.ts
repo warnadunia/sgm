@@ -3,17 +3,15 @@ import { loadEnvFile } from "./src/db/env";
 
 loadEnvFile();
 
-const url = process.env.DATABASE_URL || "file:./data/dev.db";
-
-// dbCredentials untuk Turso/libSQL menerima authToken, tetapi tipe drizzle-kit
-// lokal hanya mengenal { url } — maka diberi cast.
-const dbCredentials = (
-  process.env.DATABASE_AUTH_TOKEN ? { url, authToken: process.env.DATABASE_AUTH_TOKEN } : { url }
-) as { url: string };
+const url =
+  process.env.DATABASE_URL ||
+  "postgresql://neondb_owner:npg_YzcGMTdeq3A6@ep-calm-shadow-azo3mput-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 
 export default defineConfig({
-  dialect: "sqlite",
+  dialect: "postgresql",
   schema: "./src/db/schema.ts",
   out: "./drizzle",
-  dbCredentials,
+  dbCredentials: {
+    url,
+  },
 });

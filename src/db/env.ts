@@ -6,13 +6,15 @@ import path from "node:path";
  * karena hanya Next.js yang otomatis membaca .env.
  */
 export function loadEnvFile() {
-  try {
-    const raw = fs.readFileSync(path.join(process.cwd(), ".env"), "utf8");
-    for (const line of raw.split("\n")) {
-      const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"?([^"\n]*)"?\s*$/);
-      if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+  for (const file of [".env.local", ".env"]) {
+    try {
+      const raw = fs.readFileSync(path.join(process.cwd(), file), "utf8");
+      for (const line of raw.split("\n")) {
+        const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"?([^"\n]*)"?\s*$/);
+        if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+      }
+    } catch {
+      // file opsional
     }
-  } catch {
-    // .env opsional
   }
 }
